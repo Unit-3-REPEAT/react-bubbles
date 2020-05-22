@@ -1,15 +1,34 @@
 import React, { useState } from "react";
-import axios from "axios";
+import { axiosWithAuth } from "../utils/axiosWithAuth";
+
+
+
 
 const initialColor = {
   color: "",
   code: { hex: "" }
 };
 
-const ColorList = ({ colors, updateColors }) => {
-  console.log(colors);
+const ColorList = ({ colors, updateColors, fetchColors }) => {
+  console.log(`colors -->`, {colors});
+  
   const [editing, setEditing] = useState(false);
   const [colorToEdit, setColorToEdit] = useState(initialColor);
+  // console.log(`colorToEdit ->`, colorToEdit)
+  
+ const getId = colors.filter((color) => {
+  console.log(color)
+});
+
+ 
+
+ 
+
+
+
+
+  // const {params} = useParams();
+  // console.log(`params`, params);
 
   const editColor = color => {
     setEditing(true);
@@ -21,6 +40,15 @@ const ColorList = ({ colors, updateColors }) => {
     // Make a put request to save your updated color
     // think about where will you get the id from...
     // where is is saved right now?
+    console.log(`getId`, getId)
+    axiosWithAuth()
+    .put(`/api/colors/${getId}`, colorToEdit)    
+    .then(response => {
+      console.log(`response ColorList.js`, response)
+      fetchColors();  
+    })
+
+    .catch(error => {console.log(`There was an error with put request`, error.response)})
   };
 
   const deleteColor = color => {
