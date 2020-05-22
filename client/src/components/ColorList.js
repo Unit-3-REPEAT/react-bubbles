@@ -1,16 +1,30 @@
 import React, { useState } from "react";
-import axios from "axios";
+import { axiosWithAuth } from "../utils/axiosWithAuth";
+import { useParams, useHistory } from "react-router-dom";
+
+
+
+
 
 const initialColor = {
   color: "",
   code: { hex: "" }
 };
 
-const ColorList = ({ colors, updateColors }) => {
-  console.log(colors);
+const ColorList = ({ colors, updateColors, fetchColors }) => {
+  const params = useParams();
+  console.log(`paramsid -->`, params)
+  const history = useHistory();
+  // console.log(`push -->`, push);
+
+  // console.log(`colors -->`, {colors});  
   const [editing, setEditing] = useState(false);
   const [colorToEdit, setColorToEdit] = useState(initialColor);
+  // console.log(`colorToEdit ->`, colorToEdit)
+  
 
+
+  
   const editColor = color => {
     setEditing(true);
     setColorToEdit(color);
@@ -21,10 +35,32 @@ const ColorList = ({ colors, updateColors }) => {
     // Make a put request to save your updated color
     // think about where will you get the id from...
     // where is is saved right now?
+    
+    axiosWithAuth()
+    .put(`/api/colors/${params.id}`, colorToEdit)    
+    .then(response => {
+      console.log(`response.data ColorList.js`, response.data);      
+       const checkIfIdMatches = colors.map(item => {
+          if(item.id === response.data.id){ 
+            return response.data
+          } return item
+       })
+      updateColors(checkIfIdMatches);
+    })
+
+    .catch(error => {console.log(`There was an error with put request`, error.response)})
   };
 
   const deleteColor = color => {
     // make a delete request to delete this color
+    axiosWithAuth()
+    .delete(`/api/colors/${color.id}`)
+    .then(response => {
+      console.log(`-->`, response)
+      fetchColors();
+      history.push('/bubblepage')
+    })
+    .catch(error => {console.log(`There was an error with delete request`, error.response)})
   };
 
   return (
@@ -87,3 +123,5 @@ const ColorList = ({ colors, updateColors }) => {
 };
 
 export default ColorList;
+
+
